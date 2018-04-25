@@ -1,0 +1,18 @@
+{
+  "name": "expressmovies",
+  "version": "1.0.0",
+  "description": "app for movie fans",
+  "main": "app.js",
+  "scripts": {
+  	"start": "nodemon app.js",
+    "test": "echo \"Error: no test specidied \" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  }
+}
