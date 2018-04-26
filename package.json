@@ -4,12 +4,13 @@
   "description": "app for movie fans",
   "main": "app.js",
   "scripts": {
-  	"start": "nodemon app.js",
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specidied \" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^2.5.9",
     "express": "^4.16.3"
   },
   "devDependencies": {

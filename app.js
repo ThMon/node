@@ -1,48 +1,39 @@
 const express = require('express');
 const app = express();
+
 const PORT = 3000;
 
-let db = {
-	users: {
-		a234: {
-			'name': 'michel',
-			'surname': 'mich',
-			'role': 'admin',
-			'campain' : 'deezer'
-		},
-		a235: {
-			'name': 'michel',
-			'surname': 'mich',
-			'role': 'user',
-			'campain': 'krowdis'
-		}
-	}
+app.use('/public', express.static('public'));
 
-}
 
-app.get('/api/users', (req, res)=> {
-	const name = req.params.name
-	res.json(db.users);
+app.set('views', './views');
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res)=> {
+	//res.send('<p>Hello</p>');
+	res.render('index');
 });
 
+// app.get('/movie-details', (req, res)=>{
+// 	res.render('movie-details');
+// });
 
-app.get('/api/users/:id', (req, res)=> {
-	const id = req.params.id
-	//res.json(db.users[id]);
-
-	//res.send('<p> Nom : '+ db.users[id].name + ' son rôle : ' + db.users[id].role)
-
-	if (db.users[id].campain == 'krowdis' || db.users[id].role == 'admin') {
-
-		res.send('Vous êtes autorisé');
-	} else {
-		res.send('Vous n\'avez pas accès à cette campagne');
-	}
-
+app.get('/movies', (req, res)=>{
+	//res.send('Bientôt des films ici même');
+	res.render('movies');
 });
 
+app.get('/movies/add', (req, res)=>{
+	res.send('on ajoute des films');
+});
 
-
+// envoyer un parametre par l'url
+app.get('/movies/:id/:title', (req, res)=>{
+	const id = req.params.id;
+	const title = req.params.title;; 
+	//res.send(`le num du film est ${id}`);
+	res.render('movie-details', { movieId: id, title: title });
+});
 
 
 app.listen(PORT, ()=>{
