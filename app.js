@@ -1,10 +1,15 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const upload = multer();
 
 const PORT = 3000;
+let frenchMovies = [];
 
 app.use('/public', express.static('public'));
-
+// methode pour toutes les route sinon pour route unique mettre ds la methode post
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
@@ -20,7 +25,39 @@ app.get('/', (req, res)=> {
 
 app.get('/movies', (req, res)=>{
 	//res.send('Bientôt des films ici même');
-	res.render('movies');
+	const title = 'Film français des trente dernières années';
+
+
+	frenchMovies = [
+		{title: 'Le fabuleux destin d\'Amélie Poulain', year: 2001},
+		{title: 'Buffet froid', year: 1979},
+		{title: 'Le dîner de cons', year: 1998},
+		{title: 'De rouille et d\'os', year: 2012}
+	];
+	res.render('movies', { movies : frenchMovies, title: title });
+});
+
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+//Méthode Post
+// app.post('/movies', urlencodedParser, (req, res)=>{
+	
+// 	const newMovie = { title:  req.body.movietitle, year: req.body.movieyear };
+// 	frenchMovies = [... frenchMovies, newMovie];
+// 	//frenchMovies.push(newMovie);
+// 	console.log(frenchMovies);
+// 	res.sendStatus(201);
+// });
+
+app.post('/movies', upload.fields([]), (req, res) => {
+	if(!req.body) {
+		return res.sendStatus(500);
+	} else {
+		const formData = req.body;
+		console.log(formData);
+		const newMovie = { title:  req.body.movietitle, year: req.body.movieyear };
+		frenchMovies = [... frenchMovies, newMovie];
+		res.sendStatus(201);
+	}
 });
 
 app.get('/movies/add', (req, res)=>{
