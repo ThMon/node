@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Express Movies</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="../public/style.css">
+</head>
+<body>
+	<% include ./partials/header %>
+	<h1>Recherche sur <em> The Movie Database</em></h1>
+	<div>
+			<input type="text" name="term" id="term">
+			<button id="btnSearch">chercher</button>
+	</div>
+
+	<div id="results">
+
+	</div>
+
+	<% include ./partials/footer %>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script type="text/javascript">
+		const API_KEY = "2ee2c5b569240ea2a2a879dd9c8a822c";
+		let term = document.getElementById("term");
+		let btnSearch= document.getElementById('btnSearch');
+		btnSearch.addEventListener('click', search);
+
+		let resultsDiv = document.getElementById('results');
+
+		function search() {
+			const query = 'https://api.themoviedb.org/3/search/movie?api_key='+API_KEY+'&query='+term.value;
+			axios.get(query)
+				.then(function(response){
+					console.log(response.data.results);
+					displayResults(response.data.results);
+				});
+		}
+
+		function displayResults(results) {
+			resultsDiv.innerHTML = '';
+			for(let result of results) {
+				console.log(result.title);
+				let movieDiv = document.createElement('p');
+				movieDiv.textContent = result.title;
+				console.log(movieDiv);
+				resultsDiv.appendChild(movieDiv);
+			}
+		}
+
+	</script>
+</body>
+</html>

@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser'); // recupération data form vers back
 const multer = require('multer');
 const upload = multer();
+const jwt = require('jsonwebtoken');
 
 const PORT = 3000;
 let frenchMovies = [];
@@ -64,6 +65,11 @@ app.get('/movies/add', (req, res)=>{
 	res.send('on ajoute des films');
 });
 
+app.get('/movie-search', (req, res)=>{
+	res.render('movie-search');
+});
+
+
 // envoyer un parametre par l'url
 app.get('/movies/:id/:title', (req, res)=>{
 	const id = req.params.id;
@@ -72,6 +78,36 @@ app.get('/movies/:id/:title', (req, res)=>{
 	res.render('movie-details', { movieId: id, title: title });
 });
 
+app.get('/login', (req, res)=>{
+	res.render('login', { title: 'Espace membre ' });
+});
+
+const fakeUser = { email: 'thib', password: 'azerty' };
+const secret = 'dskndjsnbdjsbcnsdsdsdnddsfdjjgj12344'
+
+app.post('/login', urlencodedParser, (req, res) => {
+	if(!req.body) {
+		return res.sendStatus(500);
+	} else {
+		const formData = req.body;
+		console.log(formData);
+
+		if (fakeUser.email == formData.email && fakeUser.password == formData.password ) {
+			const myToken = jwt.sign( { iss: 'http://expressmovies.fr', user: 'Thib', role: 'moderateur'}, secret );
+			res.json( myToken );
+			/*
+			res.json( {
+				email: 'thib',
+				favoriteMovie: 'Titanic',
+				favoriteMovieTheater: 'dîner de con',
+				lastLoginDate: new Date()
+			} );*/
+		} else {
+			res.sendStatus(401);
+		}
+	}
+
+});
 
 app.listen(PORT, ()=>{
 	console.log(`listen on port ${PORT}` );
