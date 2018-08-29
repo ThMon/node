@@ -4,6 +4,27 @@ const bodyParser = require('body-parser'); // recupération data form vers back
 const multer = require('multer');
 const upload = multer();
 const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt'); // gérer une autorisation
+const mongoose = require('mongoose');
+
+const secret = 'dskndjsnbdjsbcnsdsdsdnddsfdjjgj12344';
+
+// Partie mongodb
+
+// connection
+mongoose.connect('mongodb://thibaut:mouloud007@ds237192.mlab.com:37192/express');
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error: cannot connect to my db'));
+db.once('open', () => {
+	console.log('connected to the DB :)');
+});
+
+// schema mongoose
+
+const movieSchema = mongoose.Schema({
+	movietitle: String,
+	movieyear: Number
+});
 
 const PORT = 3000;
 let frenchMovies = [];
@@ -11,6 +32,8 @@ let frenchMovies = [];
 app.use('/public', express.static('public'));
 // methode pour toutes les route sinon pour route unique mettre ds la methode post
 // app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(expressJwt({ secret: secret }).unless({ path: ['/', '/movies', '/movie-search', '/login']})); // seul la page de login à autorisation
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
@@ -57,6 +80,7 @@ app.post('/movies', upload.fields([]), (req, res) => {
 		console.log(formData);
 		const newMovie = { title:  req.body.movietitle, year: req.body.movieyear };
 		frenchMovies = [... frenchMovies, newMovie];
+		//res.json({hello: 'gege', bonjour: 'fe'})
 		res.sendStatus(201);
 	}
 });
@@ -83,7 +107,6 @@ app.get('/login', (req, res)=>{
 });
 
 const fakeUser = { email: 'thib', password: 'azerty' };
-const secret = 'dskndjsnbdjsbcnsdsdsdnddsfdjjgj12344'
 
 app.post('/login', urlencodedParser, (req, res) => {
 	if(!req.body) {
@@ -107,6 +130,11 @@ app.post('/login', urlencodedParser, (req, res) => {
 		}
 	}
 
+});
+
+app.get('/member-only', (req, res)=> {
+	console.log('req-user', req.user);
+	res.send(req.user);
 });
 
 app.listen(PORT, ()=>{

@@ -28,11 +28,15 @@
             <button id="disconectBtn">déconnexion</button>
             <button id="display-payload">Voir le apyload</button>
             <div id="decoded-payload"></div>
+            <div>
+                <a href="#" id="member-only">espace membre</a>
+            </div>
         </div>
 
         <footer>
             <% include ./partials/footer %>
         </footer>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script>
             var form = document.querySelector('form');
             form.addEventListener("submit", loginUser); 
@@ -48,6 +52,9 @@
 
 
             displayPayloadBtn.addEventListener('click', displayPayload);
+
+            var memberOnlyLink = document.querySelector('#member-only');
+            memberOnlyLink.addEventListener('click', makeRequestWithToken);
 
             function loginUser(event) {             
                 loginUserWithXHR(event);
@@ -67,7 +74,7 @@
                 xhr.onreadystatechange = function() {//Call a function when the state changes.
                     if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
                        // recupération de la response  
-                        console.log(xhr.response);
+                        console.log('response',xhr.response);
                         var token = xhr.response;
                         window.localStorage.setItem('token', token);
                         switchToLoginMode();
@@ -123,6 +130,29 @@
                 }
             } 
 
+            function makeRequestWithToken(evt) {
+                evt.preventDefault();
+                var page = this.id;
+                console.log('page', page);
+                tokenFromStorage = localStorage.getItem('token');
+                var config =  {};
+
+                if(tokenFromStorage) {
+                    config.headers =  {'Authorization': 'Bearer '+ JSON.parse(tokenFromStorage)}
+                }
+
+
+                axios.get(
+                    'http://localhost:3000/'+ page,
+                    config
+                ).then(res => {
+                    console.log('success');
+                    console.log(res);
+                }).catch(err => {
+                    console.log('err', err);
+                });
+
+            }
 
             handleFormDisplay();
 
