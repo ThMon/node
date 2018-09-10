@@ -57,7 +57,7 @@ app.use('/public', express.static('public'));
 // methode pour toutes les route sinon pour route unique mettre ds la methode post
 // app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(expressJwt({ secret: secret }).unless({ path: ['/', '/movies', '/movie-search', '/login']})); // seul la page de login à autorisation
+app.use(expressJwt({ secret: secret }).unless({ path: ['/', '/movies', '/movie-search', '/login', '/movies/:id', new RegExp('/movies.*/', 'i'), new RegExp('/movie-details.*/', 'i')]})); // seul la page de login à autorisation
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
@@ -147,11 +147,26 @@ app.get('/movie-search', (req, res)=>{
 
 
 // envoyer un parametre par l'url
-app.get('/movies/:id/:title', (req, res)=>{
+app.get('/movies/:id/:title',  (req, res)=>{
 	const id = req.params.id;
 	const title = req.params.title;; 
 	//res.send(`le num du film est ${id}`);
 	res.render('movie-details', { movieId: id, title: title });
+});
+
+app.put('/movies/:id', urlencodedParser, (req, res)=> {
+	if (!req.body) {
+		return res.sendStatus(500);
+	}
+	console.log('movietitle; ', req.body.movietitle, 'movieyear: ', req.body.movieyear);
+	const id = req.params.id;
+	Movie.findByIdAndUpdate(id, { $set: { movietitle: req.body.movietitle, movieyear: req.body.movieyear } }, { new: true }, (err, movie) => {
+		if(err) {
+			console.log(err);
+			return res.send('le film n a pas pu être trouvé');		
+		}
+		res.redirect('/movies');
+	});
 });
 
 app.get('/login', (req, res)=>{
@@ -159,6 +174,14 @@ app.get('/login', (req, res)=>{
 });
 
 const fakeUser = { email: 'thib', password: 'azerty' };
+
+app.get('/movie-details/:id', (req, res) => {
+	const id = req.params.id;
+	Movie.findById(id, (err, movie)=>{
+		console.log('movie', movie);
+		res.render('movie-details', {movieId: movie._id})
+	});
+});
 
 app.post('/login', urlencodedParser, (req, res) => {
 	if(!req.body) {
